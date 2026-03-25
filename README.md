@@ -242,19 +242,32 @@ npm run dev
 
 The system is designed to answer questions like:
 
-- _Which products are associated with the highest number of billing documents?_
-- The top products associated with the highest number of billing documents are S8907367039280 and S8907367008620, both with 22 billing documents. The next highest is S8907367042006 with 16 billing documents, followed by S8907367013532 with 15 billing documents. The list continues with products having 9, 8, 7, 6, and 4 billing documents. The results show a total of 50 products with varying numbers of billing documents, with the lowest being 4 billing documents for several products, including S8907367041993, S8907367038108, and S8907367035992.
-- SQL that was generated: 
+---
+
+### Query: Which products are associated with the highest number of billing documents?
+
+**Result:**  
+The top products associated with the highest number of billing documents are S8907367039280 and S8907367008620, both with 22 billing documents. The next highest is S8907367042006 with 16 billing documents, followed by S8907367013532 with 15 billing documents. The list continues with products having 9, 8, 7, 6, and 4 billing documents. The results show a total of 50 products with varying numbers of billing documents, with the lowest being 4 billing documents for several products, including S8907367041993, S8907367038108, and S8907367035992.
+
+**Generated SQL:**
+```sql
 SELECT bdi.material, COUNT(DISTINCT bdh.billing_document) as num_billing_docs
 FROM billing_document_headers bdh
 LEFT JOIN billing_document_items bdi ON bdi.billing_document = bdh.billing_document
 GROUP BY bdi.material
 ORDER BY num_billing_docs DESC
-LIMIT 50
+LIMIT 50;
+```
 
-- _Trace the full flow for billing document 91150187_
-- The billing document 91150187 has a total net amount of $329.66 and was created on April 2, 2025. It is associated with sales order 740550 and delivery document 80738070. The sold-to party is Nelson, Fitzpatrick and Jordan. The billing document has not been cancelled, as indicated by the "billing_document_is_cancelled" flag being set to 0. The corresponding accounting document is 9400635958. This suggests a complete order-to-cash flow, from sales order to delivery and finally to billing.
-- SQL that was generated:
+---
+
+### Query: Trace the full flow for billing document 91150187
+
+**Result:**  
+The billing document 91150187 has a total net amount of $329.66 and was created on April 2, 2025. It is associated with sales order 740550 and delivery document 80738070. The sold-to party is Nelson, Fitzpatrick and Jordan. The billing document has not been cancelled, as indicated by the "billing_document_is_cancelled" flag being set to 0. The corresponding accounting document is 9400635958. This suggests a complete order-to-cash flow, from sales order to delivery and finally to billing.
+
+**Generated SQL:**
+```sql
 SELECT bdh.billing_document, soh.sales_order, odh.delivery_document, 
        bp.business_partner_name, bdh.total_net_amount, bdh.billing_document_date, 
        bdh.billing_document_is_cancelled, bdh.accounting_document
@@ -265,31 +278,52 @@ LEFT JOIN outbound_delivery_items odi   ON odi.delivery_document = odh.delivery_
 LEFT JOIN sales_order_headers soh       ON soh.sales_order = odi.reference_sd_document
 LEFT JOIN business_partners bp          ON bp.business_partner = bdh.sold_to_party
 WHERE bdh.billing_document = '91150187'
-LIMIT 50
+LIMIT 50;
+```
 
-- _Show sales orders that were delivered but never billed_
-- The query results show 3 sales orders that were delivered but never billed. The sales order numbers are 740506, 740507, and 740508. These orders have associated outbound deliveries, but no corresponding billing documents were found. This suggests that the delivery process was completed, but the billing process was not triggered or completed for these orders.
-- SQL that was generated:
+---
+
+### Query: Show sales orders that were delivered but never billed
+
+**Result:**  
+The query results show 3 sales orders that were delivered but never billed. The sales order numbers are 740506, 740507, and 740508. These orders have associated outbound deliveries, but no corresponding billing documents were found. This suggests that the delivery process was completed, but the billing process was not triggered or completed for these orders.
+
+**Generated SQL:**
+```sql
 SELECT DISTINCT soh.sales_order
 FROM sales_order_headers soh
 LEFT JOIN outbound_delivery_items odi ON odi.reference_sd_document = soh.sales_order
 LEFT JOIN billing_document_items bdi ON bdi.reference_sd_document = odi.delivery_document
 WHERE odi.delivery_document IS NOT NULL AND bdi.billing_document IS NULL
-LIMIT 50
+LIMIT 50;
+```
 
-- _Which customers have the highest total billed amount?_
-- The top customers with the highest total billed amount are: 1. Nelson, Fitzpatrick and Jordan with $55,337.76, 2. Nguyen-Davis with $4,769.30, 3. Hawkins Ltd with $442.38, and 4. Flores-Simmons with $359.32. These four customers have the highest total billed amounts, with Nelson, Fitzpatrick and Jordan having the largest amount by a significant margin.
-- SQL that was generated:
+---
+
+### Query: Which customers have the highest total billed amount?
+
+**Result:**  
+The top customers with the highest total billed amount are: 1. Nelson, Fitzpatrick and Jordan with $55,337.76, 2. Nguyen-Davis with $4,769.30, 3. Hawkins Ltd with $442.38, and 4. Flores-Simmons with $359.32. These four customers have the highest total billed amounts, with Nelson, Fitzpatrick and Jordan having the largest amount by a significant margin.
+
+**Generated SQL:**
+```sql
 SELECT bp.business_partner_name, SUM(bdh.total_net_amount) AS total_billed_amount
 FROM billing_document_headers bdh
 LEFT JOIN business_partners bp ON bp.business_partner = bdh.sold_to_party
 GROUP BY bp.business_partner_name
 ORDER BY total_billed_amount DESC
-LIMIT 50
+LIMIT 50;
+```
 
-- _Find all cancelled billing documents and their linked sales orders_
-- The query results show 20 cancelled billing documents with their linked sales orders. The cancelled billing documents have IDs such as 90504274, 90504242, and 90678703, with total net amounts ranging from 151.69 to 589.95. The linked sales orders have IDs like 740571, 740548, and 740542. The business partners associated with these documents are primarily "Nelson, Fitzpatrick and Jordan" and "Nguyen-Davis". The billing document dates are mostly on April 2, 2025, and May 16, 2025. Note that there are duplicate entries for some billing documents, such as 90678703, which appears 8 times with the same details.
-- SQL that was generated:
+---
+
+### Query: Find all cancelled billing documents and their linked sales orders
+
+**Result:**  
+The query results show 20 cancelled billing documents with their linked sales orders. The cancelled billing documents have IDs such as 90504274, 90504242, and 90678703, with total net amounts ranging from 151.69 to 589.95. The linked sales orders have IDs like 740571, 740548, and 740542. The business partners associated with these documents are primarily "Nelson, Fitzpatrick and Jordan" and "Nguyen-Davis". The billing document dates are mostly on April 2, 2025, and May 16, 2025. Note that there are duplicate entries for some billing documents, such as 90678703, which appears 8 times with the same details.
+
+**Generated SQL:**
+```sql
 SELECT bdh.billing_document, soh.sales_order, odh.delivery_document, 
        bp.business_partner_name, bdh.total_net_amount, bdh.billing_document_date, 
        bdh.billing_document_is_cancelled, bdh.accounting_document
@@ -300,16 +334,24 @@ LEFT JOIN outbound_delivery_items odi   ON odi.delivery_document = odh.delivery_
 LEFT JOIN sales_order_headers soh       ON soh.sales_order = odi.reference_sd_document
 LEFT JOIN business_partners bp          ON bp.business_partner = bdh.sold_to_party
 WHERE bdh.billing_document_is_cancelled = 1
-LIMIT 50
+LIMIT 50;
+```
 
-- _What is the total payment received for customer 320000083?_
-- The total payment received for customer 320000083 is $9,445.05. This amount is based on the sum of payments made by the customer, as recorded in the payments accounts receivable. The query only considered a limited number of records (up to 50) due to the LIMIT clause, but since only one row was returned, it appears that all relevant records were included in the calculation.
-- SQL that was generated:
+---
+
+### Query: What is the total payment received for customer 320000083?
+
+**Result:**  
+The total payment received for customer 320000083 is $9,445.05. This amount is based on the sum of payments made by the customer, as recorded in the payments accounts receivable. The query only considered a limited number of records (up to 50) due to the LIMIT clause, but since only one row was returned, it appears that all relevant records were included in the calculation.
+
+**Generated SQL:**
+```sql
 SELECT SUM(par.amount_in_transaction_currency) 
 FROM payments_accounts_receivable par 
 JOIN business_partners bp ON bp.business_partner = par.customer 
 WHERE bp.business_partner = '320000083' 
-LIMIT 50
+LIMIT 50;
+```
 
 ---
 
