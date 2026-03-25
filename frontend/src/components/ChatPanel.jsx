@@ -34,7 +34,7 @@ export default function ChatPanel({ onQueryResults }) {
 		setLoading(true);
 		try {
 			const res = await sendQuery(text);
-			console.log(res);
+			// console.log(res);
 
 			setMessages((prev) => [
 				...prev,
