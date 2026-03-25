@@ -49,7 +49,7 @@ app = FastAPI(title="O2C Graph API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://order-to-cash-graph-steel.vercel.app"],
     allow_credentials=False,   
     allow_methods=["*"],
     allow_headers=["*"],
