@@ -28,7 +28,7 @@ export default function App() {
 				setGraphData(g);
 				graphDataRef.current = g;
 			} catch {
-				setError("Cannot connect to backend. Is it running on port 8000?");
+				setError("Cannot connect to backend.");
 			} finally {
 				setLoading(false);
 			}
@@ -198,7 +198,7 @@ export default function App() {
 						fontFamily: "IBM Plex Mono, monospace",
 					}}
 				>
-					cd backend && uvicorn app.main:app --port 8000
+					Try again later!
 				</div>
 			</div>
 		);
@@ -275,4 +275,3 @@ export default function App() {
 		</div>
 	);
 }
-
