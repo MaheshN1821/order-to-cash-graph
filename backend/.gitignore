@@ -1,7 +1,6 @@
 venv
 .env
 temp.txt
-o2c.db
 
 __pycache__/
 *.pyc
